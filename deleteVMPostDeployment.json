@@ -2,12 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "projectName": {
-      "type": "string",
-      "metadata": {
-        "description": "Specifies a name for generating resource names."
-      }
-    },
     "adminUsername": {
       "type": "string",
       "defaultValue": "chgeuer",
@@ -33,6 +27,7 @@
   "variables": {
     "location": "[resourceGroup().location]",
     "artifactsLocation": "[deployment().properties.templateLink.uri]",
+    "ephemeralSuffix": "[concat('deleteme-', uniqueString(resourceGroup().id, deployment().name))]",
     "isvDetails": {
       "publisher": "upsolver1594188634150",
       "offer": "upsolver-vm",
@@ -55,13 +50,13 @@
     },
     "vNetSubnetName": "default",
     "names": {
-      "identity": "[concat(parameters('projectName'), '-identity')]",
-      "vNetName": "[concat(parameters('projectName'), '-vnet')]",
-      "vmName": "[concat(parameters('projectName'), '-vm')]",
-      "deploymentScript": "[concat(parameters('projectName'), '-deleteVmPostDeploymentScript')]",
-      "publicIPAddressName": "[concat(parameters('projectName'), '-ip')]",
-      "networkInterfaceName": "[concat(parameters('projectName'), '-nic')]",
-      "networkSecurityGroupNameSubnet": "[concat(variables('vNetSubnetName'), '-nsg')]"
+      "identity": "identity",
+      "vNetName": "vnet",
+      "networkSecurityGroupNameSubnet": "[concat(variables('vNetSubnetName'), '-nsg')]",
+      "vmName": "[concat(variables('ephemeralSuffix'), '-vm')]",
+      "publicIPAddressName": "[concat(variables('ephemeralSuffix'), '-ip')]",
+      "networkInterfaceName": "[concat(variables('ephemeralSuffix'), '-nic')]",
+      "deploymentScript": "[concat(variables('ephemeralSuffix'), '-deleteVmPostDeploymentScript')]"
     },
     "addresses": {
       "vNetAddressPrefixes": "10.0.0.0/16",
@@ -74,8 +69,7 @@
       "managedidentity_userassignedidentities": "2018-11-30",
       "MicrosoftAuthorizationRoleAssignments": "2020-04-01-preview"
     },
-    "buildInRolesID": {
-      // https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles
+    "buildInRolesID": { // https://docs.microsoft.com/en-us/azure/role-based-access-control/built-in-roles
       "Owner": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]",
       "Contributor": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
       "Reader": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]"
@@ -104,7 +98,7 @@
           {
             "name": "default-allow-22",
             "properties": {
-              "priority": 1000,
+              "priority": 101,
               "access": "Allow", "direction": "Inbound", "protocol": "Tcp",
               "sourceAddressPrefix": "*", "sourcePortRange": "*",
               "destinationAddressPrefix": "*", "destinationPortRange": "22"
