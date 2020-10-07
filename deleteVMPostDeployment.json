@@ -226,7 +226,9 @@
       "properties": {
         "roleDefinitionId": "[variables('buildInRolesID').Contributor]",
         "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('names').identity), variables('apiVersions').managedidentity_userassignedidentities).principalId]",
-        "scope": "[resourceGroup().id]"
+        "scope": "[resourceGroup().id]",
+        // https://docs.microsoft.com/en-us/azure/role-based-access-control/role-assignments-template#new-service-principal
+        "principalType": "ServicePrincipal"
       }
     },
     {
