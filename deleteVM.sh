@@ -32,7 +32,6 @@ pip_output="$( az network public-ip delete --ids "${DUMMY_IP}" )"
 
 # https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/deployment-script-template?tabs=CLI#work-with-outputs-from-cli-script
 
-
 # Hit some external service
 ip="$( curl --silent --url "https://postman-echo.com/ip" | jq ".ip" )"
 
