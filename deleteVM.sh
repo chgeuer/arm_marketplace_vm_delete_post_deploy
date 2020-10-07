@@ -33,17 +33,27 @@ pip_output="$( az network public-ip delete --ids "${DUMMY_IP}" )"
 # https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/deployment-script-template?tabs=CLI#work-with-outputs-from-cli-script
 
 # Hit some external service
-ip="$( curl --silent --url "https://postman-echo.com/ip" | jq ".ip" )"
+ip="$( curl --silent --url "https://postman-echo.com/ip" | jq -r ".ip" )"
 
 output="$( echo "{}" | \
-    jq ".output.vm=\"${vm_output}\"" |  \
-    jq ".output.disk=\"${disk_output}\"" |  \
-    jq ".output.nic=\"${nic_output}\"" |  \
-    jq ".output.pip=\"${pip_output}\"" \
-    jq ".ip=\"${ip}\"" \
+    jq --arg x "${vm_output}"   '.output.vm=($x | fromjson)'   |  \
+    jq --arg x "${disk_output}" '.output.disk=($x | fromjson)' |  \
+    jq --arg x "${nic_output}"  '.output.nic=($x | fromjson)'  |  \
+    jq --arg x "${pip_output}"  '.output.pip=($x | fromjson)'    \
+    jq --arg x "${ip}"          '.ip=$x' \
     )"
 
 echo "${output}" > "${AZ_SCRIPTS_OUTPUT_PATH}"
 echo "AZ_SCRIPTS_OUTPUT_PATH content: $(cat "${AZ_SCRIPTS_OUTPUT_PATH}" )"
 
 echo "DONE... Good bye"
+
+
+# vm_list="$( az vm list -o json )"
+# ip="$( curl --silent --url "https://postman-echo.com/ip" | jq -r ".ip" )"
+
+# echo "$( echo "{}" \
+#     \
+#    | jq --arg x "${vm_list}" '.o.vms=' \
+#    )" | jq
+
