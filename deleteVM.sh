@@ -13,16 +13,13 @@ alias jq="./jq"
 
 az login --identity
 
-vm_output="$( az vm delete ----yes --ids "${DUMMY_VM_ID}" )"
-
-disk_output="$( az disk delete --yes --no-wait --ids "${DUMMY_DISK}" )"
-
-nic_output="$( az network nic delete --no-wait --ids "${DUMMY_NIC}" )"
-
-pip_output="$( az network public-ip delete --ids "${DUMMY_IP}" )"
+vm_output="$(   az vm                delete --yes           --ids "${DUMMY_VM_ID}" )"
+disk_output="$( az disk              delete --yes --no-wait --ids "${DUMMY_DISK}" )"
+nic_output="$(  az network nic       delete       --no-wait --ids "${DUMMY_NIC}" )"
+pip_output="$(  az network public-ip delete                 --ids "${DUMMY_IP}" )"
 
 # Hit some external service
-ip="$( curl --silent --url "https://postman-echo.com/ip" | jq -r ".ip" )"
+ip="$( curl --silent --url "https://postman-echo.com/ip" | jq .ip )"
 
 # Create JSON structure
 output="$( echo "{}" | \
@@ -34,6 +31,5 @@ output="$( echo "{}" | \
 
 # https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/deployment-script-template?tabs=CLI#work-with-outputs-from-cli-script
 echo "${output}" > "${AZ_SCRIPTS_OUTPUT_PATH}"
-echo "AZ_SCRIPTS_OUTPUT_PATH content: $(cat "${AZ_SCRIPTS_OUTPUT_PATH}" )"
 
-echo "DONE... Good bye"
+echo "AZ_SCRIPTS_OUTPUT_PATH content: $(cat "${AZ_SCRIPTS_OUTPUT_PATH}" )"
