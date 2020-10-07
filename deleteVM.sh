@@ -32,4 +32,8 @@ output="$( echo "{}" | \
 # https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/deployment-script-template?tabs=CLI#work-with-outputs-from-cli-script
 echo "${output}" > "${AZ_SCRIPTS_OUTPUT_PATH}"
 
-echo "AZ_SCRIPTS_OUTPUT_PATH content: $(cat "${AZ_SCRIPTS_OUTPUT_PATH}" )"
+
+
+echo "XXX ${output}"
+echo "AZ_SCRIPTS_OUTPUT_PATH content: "
+cat "${AZ_SCRIPTS_OUTPUT_PATH}"
