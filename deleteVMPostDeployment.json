@@ -56,7 +56,7 @@
       "vmName": "[concat(variables('ephemeralSuffix'), '-vm')]",
       "publicIPAddressName": "[concat(variables('ephemeralSuffix'), '-ip')]",
       "networkInterfaceName": "[concat(variables('ephemeralSuffix'), '-nic')]",
-      "deploymentScript": "[concat(variables('ephemeralSuffix'), '-deleteVmPostDeploymentScript')]"
+      "deploymentScript": "[concat(variables('ephemeralSuffix'), '-deleteTempStuff')]"
     },
     "addresses": {
       "vNetAddressPrefixes": "10.0.0.0/16",
@@ -238,7 +238,6 @@
         "timeout": "PT30M",
         "retentionInterval": "P1D",
         "cleanupPreference": "OnSuccess",
-        "arguments": "[concat('passPhrase')]",
         "environmentVariables": [
           { "name": "GREETINGS", "secureValue": "Hello World" },
           { "name": "DUMMY_VM_ID", "value": "[resourceId('Microsoft.Compute/virtualMachines', variables('names').vmName)]" },
