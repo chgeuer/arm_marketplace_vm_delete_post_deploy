@@ -246,8 +246,12 @@
         "cleanupPreference": "OnSuccess",
         "arguments": "[concat('passPhrase')]",
         "environmentVariables": [
+          { "name": "GREETINGS", "value": "Hello World" },
+          { "name": "sec", "secureValue": "top secret" },
           { "name": "DUMMY_VM_ID", "value": "[resourceId('Microsoft.Compute/virtualMachines', variables('names').vmName)]" },
-          { "name": "GREETINGS", "value": "Hello World" }
+          { "name": "DUMMY_DISK", "value": "[resourceId('Microsoft.Compute/disks', concat(variables('names').vmName, '-disk'))]" },
+          { "name": "DUMMY_NIC", "value": "[resourceId('Microsoft.Network/networkInterfaces', variables('names').networkInterfaceName)]" },
+          { "name": "DUMMY_IP", "value": "[resourceId('Microsoft.Network/publicIPAddresses', variables('names').publicIPAddressName)]" }
         ],
         "primaryScriptUri": "[uri(variables('artifactsLocation'), 'deleteVM.sh')]"
       }
