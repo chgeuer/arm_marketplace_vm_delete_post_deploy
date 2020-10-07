@@ -33,13 +33,6 @@
       "type": "string",
       "defaultValue": "Standard_D2s_v3"
     },
-    "artifactsLocation": {
-      "type": "string",
-      "metadata": {
-          "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
-      },
-      "defaultValue": "[deployment().properties.templateLink.uri]"
-    },
     "usePreviewImage": {
       "type": "bool",
       "defaultValue": false,
@@ -49,6 +42,7 @@
     }
   },
   "variables": {
+    "artifactsLocation": "[deployment().properties.templateLink.uri]",
     "isvDetails": {
       "publisher": "upsolver1594188634150",
       "offer": "upsolver-vm",
@@ -231,7 +225,7 @@
       ],
       "properties": {
         "roleDefinitionId": "[variables('buildInRolesID').Contributor]",
-        "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('names').identity), variables('apiVersions').managedidentity_userassignedidentities, 'full').properties.principalId]",
+        "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('names').identity), variables('apiVersions').managedidentity_userassignedidentities).principalId]",
         "scope": "[resourceGroup().id]"
       }
     },
@@ -258,7 +252,7 @@
         "retentionInterval": "P1D",
         "cleanupPreference": "OnSuccess",
         "arguments": "[concat('passPhrase')]",
-        "primaryScriptUri": "[uri(parameters('artifactsLocation'), 'deleteVM.sh')]"
+        "primaryScriptUri": "[uri(variables('artifactsLocation'), 'deleteVM.sh')]"
       }
     }
   ]
