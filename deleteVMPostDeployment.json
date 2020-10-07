@@ -231,7 +231,7 @@
       ],
       "properties": {
         "roleDefinitionId": "[variables('buildInRolesID').Contributor]",
-        "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('names').identity), variables('apiVersions').managedidentity_userassignedidentities, 'full').principalId]",
+        "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('names').identity), variables('apiVersions').managedidentity_userassignedidentities, 'full').properties.principalId]",
         "scope": "[resourceGroup().id]"
       }
     },
