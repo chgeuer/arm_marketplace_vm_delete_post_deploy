@@ -8,13 +8,6 @@
         "description": "Specifies a name for generating resource names."
       }
     },
-    "location": {
-      "type": "string",
-      "defaultValue": "[resourceGroup().location]",
-      "metadata": {
-        "description": "Specifies the location for all resources."
-      }
-    },
     "adminUsername": {
       "type": "string",
       "defaultValue": "chgeuer",
@@ -29,19 +22,16 @@
         "description": "Specifies the SSH rsa public key file as a string. Use \"ssh-keygen -t rsa -b 2048\" to generate your SSH key pairs."
       }
     },
-    "vmSize": {
-      "type": "string",
-      "defaultValue": "Standard_D2s_v3"
-    },
     "usePreviewImage": {
       "type": "bool",
-      "defaultValue": false,
+      "defaultValue": true,
       "metadata": {
         "description": "Specifies whether the '-preview' image should be used."
       }
     }
   },
   "variables": {
+    "location": "[resourceGroup().location]",
     "artifactsLocation": "[deployment().properties.templateLink.uri]",
     "isvDetails": {
       "publisher": "upsolver1594188634150",
@@ -50,6 +40,7 @@
       "version": "latest"
     },
     "vmDetails": {
+      "vmSize": "Standard_D2s_v3",
       "plan": {
         "publisher": "[variables('isvDetails').publisher]",
         "product": "[concat(variables('isvDetails').offer, if(parameters('usePreviewImage'), '-preview', ''))]",
@@ -95,7 +86,7 @@
       "type": "Microsoft.Network/publicIPAddresses",
       "apiVersion": "[variables('apiVersions').MicrosoftNetwork]",
       "name": "[variables('names').publicIPAddressName]",
-      "location": "[parameters('location')]",
+      "location": "[variables('location')]",
       "sku": { "name": "Basic" },
       "properties": {
         "publicIPAllocationMethod": "Dynamic",
@@ -107,7 +98,7 @@
       "type": "Microsoft.Network/networkSecurityGroups",
       "apiVersion": "[variables('apiVersions').MicrosoftNetwork]",
       "name": "[variables('names').networkSecurityGroupNameSubnet]",
-      "location": "[parameters('location')]",
+      "location": "[variables('location')]",
       "properties": {
         "securityRules": [
           {
@@ -126,7 +117,7 @@
       "type": "Microsoft.Network/virtualNetworks",
       "apiVersion": "[variables('apiVersions').MicrosoftNetwork]",
       "name": "[variables('names').vNetName]",
-      "location": "[parameters('location')]",
+      "location": "[variables('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkSecurityGroups', variables('names').networkSecurityGroupNameSubnet)]"
       ],
@@ -153,7 +144,7 @@
       "type": "Microsoft.Network/networkInterfaces",
       "apiVersion": "[variables('apiVersions').MicrosoftNetwork]",
       "name": "[variables('names').networkInterfaceName]",
-      "location": "[parameters('location')]",
+      "location": "[variables('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/publicIPAddresses', variables('names').publicIPAddressName)]",
         "[resourceId('Microsoft.Network/virtualNetworks', variables('names').vNetName)]"
@@ -175,13 +166,13 @@
       "type": "Microsoft.Compute/virtualMachines",
       "apiVersion": "[variables('apiVersions').MicrosoftCompute]",
       "name": "[variables('names').vmName]",
-      "location": "[parameters('location')]",
+      "location": "[variables('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkInterfaces', variables('names').networkInterfaceName)]"
       ],
       "plan": "[variables('vmDetails').plan]",
       "properties": {
-        "hardwareProfile": { "vmSize": "[parameters('vmSize')]" },
+        "hardwareProfile": { "vmSize": "[variables('vmDetails').vmSize]" },
         "osProfile": {
           "computerName": "[variables('names').vmName]",
           "adminUsername": "[parameters('adminUsername')]",
@@ -236,7 +227,7 @@
       "name": "[variables('names').deploymentScript]",
       "type": "Microsoft.Resources/deploymentScripts",
       "apiVersion": "[variables('apiVersions').MicrosoftResourcesDeploymentScripts]",
-      "location": "[parameters('location')]",
+      "location": "[variables('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('names').identity)]",
         "[resourceId('Microsoft.Compute/virtualMachines', variables('names').vmName)]"
@@ -254,6 +245,10 @@
         "retentionInterval": "P1D",
         "cleanupPreference": "OnSuccess",
         "arguments": "[concat('passPhrase')]",
+        "environmentVariables": [
+          { "name": "DUMMY_VM_ID", "value": "[resourceId('Microsoft.Compute/virtualMachines', variables('names').vmName)]" },
+          { "name": "GREETINGS", "value": "Hello World" }
+        ],
         "primaryScriptUri": "[uri(variables('artifactsLocation'), 'deleteVM.sh')]"
       }
     }
