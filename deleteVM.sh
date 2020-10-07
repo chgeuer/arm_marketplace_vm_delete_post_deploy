@@ -11,18 +11,22 @@ curl \
    --output ./jq && chmod +x ./jq
 
 echo "Logging in with managed identity"
-az login --identity
+echo "$( az login --identity )"
 
+echo "###################"
 echo "VM to delete is \"${DUMMY_VM_ID}\""
-az vm delete --verbose --yes --ids "${DUMMY_VM_ID}"
+echo "$( az vm delete --verbose --yes --ids "${DUMMY_VM_ID}" )"
 
+echo "###################"
 echo "Managed disk to delete is \"${DUMMY_DISK}\""
-az disk delete --verbose --yes --no-wait --ids "${DUMMY_DISK}"
+echo "$( az disk delete --verbose --yes --no-wait --ids "${DUMMY_DISK}" )"
 
+echo "###################"
 echo "NIC to delete is \"${DUMMY_NIC}\""
-az network nic delete --verbose --no-wait --ids "${DUMMY_NIC}"
+echo "$( az network nic delete --verbose --no-wait --ids "${DUMMY_NIC}" )"
 
+echo "###################"
 echo "Public IP to delete is \"${DUMMY_IP}\""
-az network public-ip delete --verbose --ids "${DUMMY_IP}"
+echo "$( az network public-ip delete --verbose --ids "${DUMMY_IP}" )"
 
 echo "DONE... Good bye"
