@@ -240,14 +240,13 @@
       },
       "kind": "AzureCLI",
       "properties": {
-        "azCliVersion": "2.0.80",
+        "azCliVersion": "2.11.1",
         "timeout": "PT30M",
         "retentionInterval": "P1D",
         "cleanupPreference": "OnSuccess",
         "arguments": "[concat('passPhrase')]",
         "environmentVariables": [
-          { "name": "GREETINGS", "value": "Hello World" },
-          { "name": "sec", "secureValue": "top secret" },
+          { "name": "GREETINGS", "secureValue": "Hello World" },
           { "name": "DUMMY_VM_ID", "value": "[resourceId('Microsoft.Compute/virtualMachines', variables('names').vmName)]" },
           { "name": "DUMMY_DISK", "value": "[resourceId('Microsoft.Compute/disks', concat(variables('names').vmName, '-disk'))]" },
           { "name": "DUMMY_NIC", "value": "[resourceId('Microsoft.Network/networkInterfaces', variables('names').networkInterfaceName)]" },
