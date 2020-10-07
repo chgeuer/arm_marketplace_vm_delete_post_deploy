@@ -1,0 +1,1 @@
+# arm_marketplace_vm_delete_post_deploy
