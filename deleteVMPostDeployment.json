@@ -33,6 +33,13 @@
       "type": "string",
       "defaultValue": "Standard_D2s_v3"
     },
+    "artifactsLocation": {
+      "type": "string",
+      "metadata": {
+          "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
+      },
+      "defaultValue": "[deployment().properties.templateLink.uri]"
+    },
     "usePreviewImage": {
       "type": "bool",
       "defaultValue": false,
@@ -229,6 +236,7 @@
       }
     },
     {
+      // https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/deployment-script-template?tabs=CLI#use-external-scripts
       "name": "[variables('names').deploymentScript]",
       "type": "Microsoft.Resources/deploymentScripts",
       "apiVersion": "[variables('apiVersions').MicrosoftResourcesDeploymentScripts]",
@@ -250,7 +258,7 @@
         "retentionInterval": "P1D",
         "cleanupPreference": "OnSuccess",
         "arguments": "[concat('passPhrase')]",
-        "scriptContent": "#!/bin/bash\npwd\nls -als"
+        "primaryScriptUri": "[uri(parameters('artifactsLocation'), 'deleteVM.sh')]"
       }
     }
   ]
