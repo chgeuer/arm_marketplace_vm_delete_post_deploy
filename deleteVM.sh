@@ -33,10 +33,10 @@ pip_output="$( az network public-ip delete --ids "${DUMMY_IP}" )"
 # https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/deployment-script-template?tabs=CLI#work-with-outputs-from-cli-script
 
 output="$( echo "{}" | \
-    jq ".output.vm_output=\"${vm_output}\"" |  \
-    jq ".output.disk_output=\"${disk_output}\"" |  \
-    jq ".output.nic_output=\"${nic_output}\"" |  \
-    jq ".output.pip_output=\"${pip_output}\"" \
+    jq ".output.vm=\"${vm_output}\"" |  \
+    jq ".output.disk=\"${disk_output}\"" |  \
+    jq ".output.nic=\"${nic_output}\"" |  \
+    jq ".output.pip=\"${pip_output}\"" \
     )"
 
 echo "${output}" > "${AZ_SCRIPTS_OUTPUT_PATH}"
