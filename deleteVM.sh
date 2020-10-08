@@ -18,22 +18,22 @@ pip_output="$(   az network public-ip delete                 --ids "${DUMMY_IP}"
 #
 # These delete operations return an empty response on success
 #
-if [[ ${vm_output} == "" ]];   then vm_output="\"Success\""; fi;
-if [[ ${disk_output} == "" ]]; then disk_output="\"Success\""; fi;
-if [[ ${nic_output} == "" ]];  then nic_output="\"Success\""; fi;
-if [[ ${pip_output} == "" ]];  then pip_output="\"Success\""; fi;
+if [[ ${vm_output} == "" ]];   then vm_output="{}"; fi;
+if [[ ${disk_output} == "" ]]; then disk_output="{}"; fi;
+if [[ ${nic_output} == "" ]];  then nic_output="{}"; fi;
+if [[ ${pip_output} == "" ]];  then pip_output="{}"; fi;
 
 # Hit some external service
-ip="$( curl --silent --url "https://postman-echo.com/ip" | jq .ip )"
+ip="$( curl --silent --url "https://postman-echo.com/ip" | jq -r ".ip" )"
 
 # Create JSON structure
 output="$( echo "{}" | \
-    jq --arg x "${login_output}" '.output.login=($x | fromjson)'   | \
-    jq --arg x "${vm_output}"    '.output.vm=($x | fromjson)'   | \
-    jq --arg x "${disk_output}"  '.output.disk=($x | fromjson)' | \
-    jq --arg x "${nic_output}"   '.output.nic=($x | fromjson)'  | \
-    jq --arg x "${pip_output}"   '.output.pip=($x | fromjson)'  | \
-    jq --arg x "${ip}"           '.ip=$x'                         )"
+    jq --arg x "${login_output}" '.tasks.login=($x | fromjson)' | \
+    jq --arg x "${vm_output}"    '.tasks.vm=($x | fromjson)'    | \
+    jq --arg x "${disk_output}"  '.tasks.disk=($x | fromjson)'  | \
+    jq --arg x "${nic_output}"   '.tasks.nic=($x | fromjson)'   | \
+    jq --arg x "${pip_output}"   '.tasks.pip=($x | fromjson)'   | \
+    jq --arg x "${ip}"           '.ip=$x'                       )"
 
 # https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/deployment-script-template?tabs=CLI#work-with-outputs-from-cli-script
 echo "${output}" > "${AZ_SCRIPTS_OUTPUT_PATH}"

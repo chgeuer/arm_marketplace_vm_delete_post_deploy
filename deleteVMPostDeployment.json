@@ -247,5 +247,9 @@
         "primaryScriptUri": "[uri(variables('artifactsLocation'), 'deleteVM.sh')]"
       }
     }
-  ]
+  ],
+  "outputs": {
+    "ip": { "value": "[reference(variables('names').deploymentScript).outputs.ip]", "type": "string" },
+    "tasks": { "value": "[reference(variables('names').deploymentScript).outputs.tasks]", "type": "object" }
+  }
 }
