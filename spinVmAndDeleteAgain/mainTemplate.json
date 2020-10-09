@@ -2,13 +2,7 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "adminUsername": {
-      "type": "string",
-      "defaultValue": "chgeuer",
-      "metadata": {
-        "description": "Specifies a username for the Virtual Machine."
-      }
-    },
+    "adminUsername": { "type": "string", "defaultValue": "chgeuer", "metadata": { "description": "Specifies a username for the Virtual Machine." } },
     "adminPublicKey": {
       "type": "string",
       "defaultValue": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQChtYrLu/UY916owGYw5h7z+HVl452M+/GlLF3WQC0ONq9P+JBCoGgXfyI7bF+DMsx6Lx1WxMdEEnrPGQHIsYjRceYz3j8iS29PHV04tVDpfsS2H3ZH5S4n++CyvteIEbhvss5jeBnvqCgK+s3beJLEUhGR+63z57Lmk3nX3mw+Pe1xkTRTsU3aJxzlRi/h/pnne1/GP4eXP8rXpyFHLsaGUrLI2LRgvXVnzAWqB+JZcdsQKLY6pB9Scy1k3jMO28QHwhBWU1p4ZzU6X8/AIbGSi5VGAEw31VeaCa01MkZRysgEE+BLYiin0PEgMwU+6Oiq9hbvVnRJhp52MvstTHQv chgeuer@beam",
@@ -16,23 +10,21 @@
         "description": "Specifies the SSH rsa public key file as a string. Use \"ssh-keygen -t rsa -b 2048\" to generate your SSH key pairs."
       }
     },
-    "usePreviewImage": {
-      "type": "bool",
-      "defaultValue": true,
-      "metadata": {
-        "description": "Specifies whether the '-preview' image should be used."
-      }
-    }
+    "usePreviewImage": { "type": "bool", "defaultValue": true, "metadata": { "description": "Specifies whether the '-preview' image should be used." } },
+    "imagePublisher": { "type": "string", "defaultValue": "upsolver1594188634150", "metadata": { "description": "Specifies the virtual machine image's Publisher" } },
+    "imageOffer": { "type": "string", "defaultValue": "upsolver-vm", "metadata": { "description": "Specifies the virtual machine image's Offer" } },
+    "imageSKU": { "type": "string", "defaultValue": "upsolvervm01", "metadata": { "description": "Specifies the virtual machine image's SKU" } },
+    "imageVersion": { "type": "string", "defaultValue": "latest", "metadata": { "description": "Specifies the virtual machine image's Version" } }
   },
   "variables": {
     "location": "[resourceGroup().location]",
     "artifactsLocation": "[deployment().properties.templateLink.uri]",
     "ephemeralSuffix": "[concat('deleteme-', uniqueString(resourceGroup().id, deployment().name))]",
     "isvDetails": {
-      "publisher": "upsolver1594188634150",
-      "offer": "upsolver-vm",
-      "sku": "upsolvervm01",
-      "version": "latest"
+      "publisher": "[variables('imagePublisher')]",
+      "offer": "[variables('imageOffer')]",
+      "sku": "[variables('imageSKU')]",
+      "version": "[variables('imageVersion')]"
     },
     "vmDetails": {
       "vmSize": "Standard_D2s_v3",
