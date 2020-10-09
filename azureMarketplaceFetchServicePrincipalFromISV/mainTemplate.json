@@ -13,22 +13,15 @@
     "location": "[resourceGroup().location]",
     "defaultTemplateLocation": "https://raw.githubusercontent.com/chgeuer/arm_marketplace_vm_delete_post_deploy/main/azureMarketplaceFetchServicePrincipalFromISV/",
     "artifactsLocation": "[if(parameters('useRelativeScript'), deployment().properties.templateLink.uri, variables('defaultTemplateLocation') )]",
-    "ephemeral": "[concat(uniqueString(resourceGroup().id, deployment().name))]",
+    "ephemeral": "[uniqueString(resourceGroup().id)]",
     "names": {
-      "vNetName": "vnet",
-      "vNetSubnetName": "default",
-      "networkSecurityGroupNameSubnet": "default-nsg",
       "reportUsageIdentity": "[concat('report-usage-identity-for-resource-group-', resourceGroup().name)]",
-      "vmName": "[concat(variables('ephemeral'), '-vm')]",
-      "networkInterfaceName": "[concat(variables('ephemeral'), '-nic')]",
       "servicePrincipalRetrievalScript": "setupServicePrincipal",
       "reportUsageServicePrincipalKeyvault": "[concat('keyvault-', variables('ephemeral'))]"
     },
     "apiVersions": {
-      "MicrosoftNetwork": "2020-05-01",
-      "MicrosoftCompute": "2020-06-01",
-      "keyvault_vaults": "2018-02-14",
-      "keyvault_vaults_secrets": "2018-02-14",
+      "keyvault_vaults": "2019-09-01",
+      "keyvault_vaults_secrets": "2019-09-01",
       "MicrosoftResourcesDeploymentScripts": "2019-10-01-preview",
       "managedidentity_userassignedidentities": "2018-11-30",
       "MicrosoftAuthorizationRoleAssignments": "2020-04-01-preview"
@@ -121,7 +114,7 @@
           "type": "secrets",
           "apiVersion": "[variables('apiVersions').keyvault_vaults_secrets]",
           "dependsOn": [ "[concat('Microsoft.KeyVault/vaults/', variables('names').reportUsageServicePrincipalKeyvault)]" ],
-          "name": "client_id",
+          "name": "clientid", // Can't put client_id here, cause KeyVault names must not contain underscores :-/
           "properties": {
             "value": "[reference(resourceId('Microsoft.Resources/deploymentScripts', variables('names').servicePrincipalRetrievalScript), variables('apiVersions').MicrosoftResourcesDeploymentScripts).outputs.servicePrincipal.client_id]",
             "contentType": "string"
@@ -131,7 +124,7 @@
           "type": "secrets",
           "apiVersion": "[variables('apiVersions').keyvault_vaults_secrets]",
           "dependsOn": [ "[concat('Microsoft.KeyVault/vaults/', variables('names').reportUsageServicePrincipalKeyvault)]" ],
-          "name": "client_secret",
+          "name": "clientsecret",
           "properties": {
             "value": "[reference(resourceId('Microsoft.Resources/deploymentScripts', variables('names').servicePrincipalRetrievalScript), variables('apiVersions').MicrosoftResourcesDeploymentScripts).outputs.servicePrincipal.client_secret]",
             "contentType": "string"
@@ -141,7 +134,7 @@
           "type": "secrets",
           "apiVersion": "[variables('apiVersions').keyvault_vaults_secrets]",
           "dependsOn": [ "[concat('Microsoft.KeyVault/vaults/', variables('names').reportUsageServicePrincipalKeyvault)]" ],
-          "name": "tenant_id",
+          "name": "tenantid",
           "properties": {
             "value": "TODO",
             "contentType": "string"
@@ -151,6 +144,9 @@
     }
   ],
   "outputs": {
-    "scriptResults": { "value": "[reference(variables('names').servicePrincipalRetrievalScript).outputs]", "type": "object" }
+    "scriptResults": { "type": "object",    "value": "[reference(variables('names').servicePrincipalRetrievalScript).outputs]" },
+    "servicePrincipal": { "type": "object", "value": "[reference(variables('names').servicePrincipalRetrievalScript).outputs.servicePrincipal]" },
+    "client_id": { "type": "string",        "value": "[reference(variables('names').servicePrincipalRetrievalScript).outputs.servicePrincipal.client_id]" },
+    "client_secret": { "type": "string",    "value": "[reference(variables('names').servicePrincipalRetrievalScript).outputs.servicePrincipal.client_secret]" }
   }
 }
