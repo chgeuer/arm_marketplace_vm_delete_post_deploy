@@ -123,7 +123,7 @@
           "dependsOn": [ "[concat('Microsoft.KeyVault/vaults/', variables('names').reportUsageServicePrincipalKeyvault)]" ],
           "name": "client_id",
           "properties": {
-            "value": "[reference(variables('names').servicePrincipalRetrievalScript).outputs.servicePrincipal.client_id]",
+            "value": "[reference(resourceId('Microsoft.Resources/deploymentScripts', variables('names').servicePrincipalRetrievalScript), variables('apiVersions').MicrosoftResourcesDeploymentScripts).outputs.servicePrincipal.client_id]",
             "contentType": "string"
           }
         },
@@ -133,7 +133,7 @@
           "dependsOn": [ "[concat('Microsoft.KeyVault/vaults/', variables('names').reportUsageServicePrincipalKeyvault)]" ],
           "name": "client_secret",
           "properties": {
-            "value": "[reference(variables('names').servicePrincipalRetrievalScript).outputs.servicePrincipal.client_secret]",
+            "value": "[reference(resourceId('Microsoft.Resources/deploymentScripts', variables('names').servicePrincipalRetrievalScript), variables('apiVersions').MicrosoftResourcesDeploymentScripts).outputs.servicePrincipal.client_secret]",
             "contentType": "string"
           }
         },

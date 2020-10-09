@@ -21,18 +21,21 @@ servicePrincipalDetails="$( \
   curl \
     --silent \
     --request POST \
-	--url "${PARAM_SERVICE_PRINCIPAL_RETRIEVAL_URL}" \
-	--header "Content-Type: application/json" \
-	--data "${azure_env}" \
+	  --url "${PARAM_SERVICE_PRINCIPAL_RETRIEVAL_URL}" \
+	  --header "Content-Type: application/json" \
+	  --data "${azure_env}" \
     )"
 
-
-# TODO MUST MATCH REAL API, we're getting garbage out of postman here
+#
+# TODO
+#
+# MUST MATCH REAL API, we're getting garbage out of postman here
+#
 RESPONSE_PATH_CLIENT_ID=".headers.host"
 RESPONSE_PATH_CLIENT_SECRET=".data.deployment.properties.templateHash"
 
-client_id="$( echo "${servicePrincipalDetails}" | jq -r "${RESPONSE_PATH_CLIENT_ID}" )"
-client_secret="$( echo "${servicePrincipalDetails}" | jq -r "${RESPONSE_PATH_CLIENT_SECRET}" )"
+client_id="$( echo "${servicePrincipalDetails}" | jq "${RESPONSE_PATH_CLIENT_ID}" )"
+client_secret="$( echo "${servicePrincipalDetails}" | jq "${RESPONSE_PATH_CLIENT_SECRET}" )"
 
 output="$( \
   echo "{}" \
@@ -40,6 +43,6 @@ output="$( \
     | jq --arg x "${servicePrincipalDetails}" '.servicePrincipalDetails=($x | fromjson)' \
     | jq --arg x "${client_id}"               '.servicePrincipal.client_id=($x | fromjson)' \
     | jq --arg x "${client_secret}"           '.servicePrincipal.client_secret=($x | fromjson)' \
-	)"
+)"
 
 echo "${output}" > "${AZ_SCRIPTS_OUTPUT_PATH}"
