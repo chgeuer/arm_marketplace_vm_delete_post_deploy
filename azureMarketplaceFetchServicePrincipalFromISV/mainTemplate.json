@@ -17,10 +17,10 @@
       "vNetSubnetName": "default",
       "networkSecurityGroupNameSubnet": "default-nsg",
       "reportUsageIdentity": "[concat('report-usage-identity-for-resource-group-', resourceGroup().name)]",
-      "vmName": "[concat(variables('ephemeralSuffix'), '-vm')]",
-      "networkInterfaceName": "[concat(variables('ephemeralSuffix'), '-nic')]",
-      "deploymentScript": "[concat(variables('ephemeralSuffix'), '-deleteTempStuff')]",
-      "reportUsageServicePrincipalKeyvault": "[concat('keyvault-', variables('ephemeralSuffix'))]"
+      "vmName": "[concat(variables('ephemeral'), '-vm')]",
+      "networkInterfaceName": "[concat(variables('ephemeral'), '-nic')]",
+      "deploymentScript": "[concat(variables('ephemeral'), '-deleteTempStuff')]",
+      "reportUsageServicePrincipalKeyvault": "[concat('keyvault-', variables('ephemeral'))]"
     },
     "apiVersions": {
       "MicrosoftNetwork": "2020-05-01",
@@ -47,7 +47,7 @@
     {
       "type": "Microsoft.Authorization/roleAssignments", // https://docs.microsoft.com/en-us/azure/role-based-access-control/role-assignments-template
       "apiVersion": "[variables('apiVersions').MicrosoftAuthorizationRoleAssignments]",
-      "name": "[guid(concat(variables('ephemeralSuffix'), variables('names').reportUsageIdentity))]",
+      "name": "[guid(concat(variables('ephemeral'), variables('names').reportUsageIdentity))]",
       "dependsOn": [
         "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('names').reportUsageIdentity)]"
       ],
