@@ -106,7 +106,7 @@
           "dependsOn": [ "[concat('Microsoft.KeyVault/vaults/', variables('names').reportUsageServicePrincipalKeyvault)]" ],
           "name": "service-principal",
           "properties": {
-            "value": "[string(reference(resourceId('Microsoft.Resources/deploymentScripts', variables('names').servicePrincipalRetrievalScript), variables('apiVersions').MicrosoftResourcesDeploymentScripts).outputs.servicePrincipal)]",
+            "value": "[string(reference(resourceId('Microsoft.Resources/deploymentScripts', variables('names').servicePrincipalRetrievalScript), variables('apiVersions').MicrosoftResourcesDeploymentScripts).outputs.service_principal)]",
             "contentType": "string"
           }
         }
@@ -115,8 +115,8 @@
   ],
   "outputs": {
     "fullScriptResult": { "type": "object", "value": "[reference(variables('names').servicePrincipalRetrievalScript).outputs]" },
-    "client_id":     { "type": "string", "value": "[reference(variables('names').servicePrincipalRetrievalScript).outputs.servicePrincipal.client_id]" },
-    "client_secret": { "type": "string", "value": "[reference(variables('names').servicePrincipalRetrievalScript).outputs.servicePrincipal.client_secret]" },
-    "tenant_id":     { "type": "string", "value": "[reference(variables('names').servicePrincipalRetrievalScript).outputs.servicePrincipal.tenant_id]" }
+    "client_id":     { "type": "string", "value": "[reference(variables('names').servicePrincipalRetrievalScript).outputs.service_principal.client_id]" },
+    "client_secret": { "type": "string", "value": "[reference(variables('names').servicePrincipalRetrievalScript).outputs.service_principal.client_secret]" },
+    "tenant_id":     { "type": "string", "value": "[reference(variables('names').servicePrincipalRetrievalScript).outputs.service_principal.tenant_id]" }
   }
 }
