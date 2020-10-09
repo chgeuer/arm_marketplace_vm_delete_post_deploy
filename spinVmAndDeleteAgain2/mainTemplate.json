@@ -27,7 +27,7 @@
         "sku": "[variables('isvDetails').sku]",
         "version": "[variables('isvDetails').version]"
       },
-      "vmSize": "Standard_D1s_v3",
+      "vmSize": "Standard_D2s_v3",
       "dummyUser": {
         "adminUsername": "admin",
         "adminPublicKey": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQChtYrLu/UY916owGYw5h7z+HVl452M+/GlLF3WQC0ONq9P+JBCoGgXfyI7bF+DMsx6Lx1WxMdEEnrPGQHIsYjRceYz3j8iS29PHV04tVDpfsS2H3ZH5S4n++CyvteIEbhvss5jeBnvqCgK+s3beJLEUhGR+63z57Lmk3nX3mw+Pe1xkTRTsU3aJxzlRi/h/pnne1/GP4eXP8rXpyFHLsaGUrLI2LRgvXVnzAWqB+JZcdsQKLY6pB9Scy1k3jMO28QHwhBWU1p4ZzU6X8/AIbGSi5VGAEw31VeaCa01MkZRysgEE+BLYiin0PEgMwU+6Oiq9hbvVnRJhp52MvstTHQv"
