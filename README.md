@@ -3,10 +3,9 @@
 
 ## Deploy
 
-[![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fchgeuer%2Farm_marketplace_vm_delete_post_deploy%2Fmain%2FdeleteVMPostDeployment.json) 
+[![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fchgeuer%2Farm_marketplace_vm_delete_post_deploy%2Fmain%2FspinVmAndDeleteAgain%2FmainTemplate.json) 
 
-
-## What is it
+## What is this
 
 Goal if this template is to be executed with a managed application deployment from Azure Marketplace.
 
