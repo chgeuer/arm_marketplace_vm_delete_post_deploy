@@ -2,14 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "adminUsername": { "type": "string", "defaultValue": "chgeuer", "metadata": { "description": "Specifies a username for the Virtual Machine." } },
-    "adminPublicKey": {
-      "type": "string",
-      "defaultValue": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQChtYrLu/UY916owGYw5h7z+HVl452M+/GlLF3WQC0ONq9P+JBCoGgXfyI7bF+DMsx6Lx1WxMdEEnrPGQHIsYjRceYz3j8iS29PHV04tVDpfsS2H3ZH5S4n++CyvteIEbhvss5jeBnvqCgK+s3beJLEUhGR+63z57Lmk3nX3mw+Pe1xkTRTsU3aJxzlRi/h/pnne1/GP4eXP8rXpyFHLsaGUrLI2LRgvXVnzAWqB+JZcdsQKLY6pB9Scy1k3jMO28QHwhBWU1p4ZzU6X8/AIbGSi5VGAEw31VeaCa01MkZRysgEE+BLYiin0PEgMwU+6Oiq9hbvVnRJhp52MvstTHQv chgeuer@beam",
-      "metadata": {
-        "description": "Specifies the SSH rsa public key file as a string. Use \"ssh-keygen -t rsa -b 2048\" to generate your SSH key pairs."
-      }
-    },
     "imageURN": { "type": "string", "defaultValue": "upsolver1594188634150:upsolver-vm:upsolvervm01:latest", "metadata": { "description": "Specifies the virtual machine image's URN" } },
     "usePreviewImage": { "type": "bool", "defaultValue": true, "metadata": { "description": "Specifies whether the '-preview' image should be used." } }
   },
@@ -18,13 +10,12 @@
     "artifactsLocation": "[deployment().properties.templateLink.uri]",
     "ephemeralSuffix": "[concat('deleteme-', uniqueString(resourceGroup().id, deployment().name))]",
     "isvDetails": {
-      "publisher": "[split(variables('imageURN'),':')[0]]",
-      "offer": "[split(variables('imageURN'),':')[1]]",
-      "sku": "[split(variables('imageURN'),':')[2]]",
-      "version": "[split(variables('imageURN'),':')[3]]"
+      "publisher": "[split(parameters('imageURN'),':')[0]]",
+      "offer": "[split(parameters('imageURN'),':')[1]]",
+      "sku": "[split(parameters('imageURN'),':')[2]]",
+      "version": "[split(parameters('imageURN'),':')[3]]"
     },
     "vmDetails": {
-      "vmSize": "Standard_D2s_v3",
       "plan": {
         "publisher": "[variables('isvDetails').publisher]",
         "product": "[concat(variables('isvDetails').offer, if(parameters('usePreviewImage'), '-preview', ''))]",
@@ -35,6 +26,11 @@
         "offer": "[concat(variables('isvDetails').offer, if(parameters('usePreviewImage'), '-preview', ''))]",
         "sku": "[variables('isvDetails').sku]",
         "version": "[variables('isvDetails').version]"
+      },
+      "vmSize": "Standard_D1s_v3",
+      "dummyUser": {
+        "adminUsername": "admin",
+        "adminPublicKey": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQChtYrLu/UY916owGYw5h7z+HVl452M+/GlLF3WQC0ONq9P+JBCoGgXfyI7bF+DMsx6Lx1WxMdEEnrPGQHIsYjRceYz3j8iS29PHV04tVDpfsS2H3ZH5S4n++CyvteIEbhvss5jeBnvqCgK+s3beJLEUhGR+63z57Lmk3nX3mw+Pe1xkTRTsU3aJxzlRi/h/pnne1/GP4eXP8rXpyFHLsaGUrLI2LRgvXVnzAWqB+JZcdsQKLY6pB9Scy1k3jMO28QHwhBWU1p4ZzU6X8/AIbGSi5VGAEw31VeaCa01MkZRysgEE+BLYiin0PEgMwU+6Oiq9hbvVnRJhp52MvstTHQv"
       }
     },
     "vNetSubnetName": "default",
@@ -43,7 +39,6 @@
       "networkSecurityGroupNameSubnet": "[concat(variables('vNetSubnetName'), '-nsg')]",
       "identity": "[concat(variables('ephemeralSuffix'), '-identity')]",
       "vmName": "[concat(variables('ephemeralSuffix'), '-vm')]",
-      "publicIPAddressName": "[concat(variables('ephemeralSuffix'), '-ip')]",
       "networkInterfaceName": "[concat(variables('ephemeralSuffix'), '-nic')]",
       "deploymentScript": "[concat(variables('ephemeralSuffix'), '-deleteTempStuff')]"
     },
@@ -65,17 +60,6 @@
     }
   },
   "resources": [
-    {
-      "type": "Microsoft.Network/publicIPAddresses",
-      "apiVersion": "[variables('apiVersions').MicrosoftNetwork]",
-      "name": "[variables('names').publicIPAddressName]",
-      "location": "[variables('location')]",
-      "sku": { "name": "Basic" },
-      "properties": {
-        "publicIPAllocationMethod": "Dynamic",
-        "publicIPAddressVersion": "IPv4"
-      }
-    },
     {
       "comments": "Simple Network Security Group for subnet",
       "type": "Microsoft.Network/networkSecurityGroups",
@@ -129,7 +113,6 @@
       "name": "[variables('names').networkInterfaceName]",
       "location": "[variables('location')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/publicIPAddresses', variables('names').publicIPAddressName)]",
         "[resourceId('Microsoft.Network/virtualNetworks', variables('names').vNetName)]"
       ],
       "properties": {
@@ -138,7 +121,6 @@
             "name": "ipconfig1",
             "properties": {
               "privateIPAllocationMethod": "Dynamic",
-              "publicIPAddress": { "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('names').publicIPAddressName)]" },
               "subnet": { "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('names').vNetName, variables('vNetSubnetName'))]" }
             }
           }
@@ -158,14 +140,14 @@
         "hardwareProfile": { "vmSize": "[variables('vmDetails').vmSize]" },
         "osProfile": {
           "computerName": "[variables('names').vmName]",
-          "adminUsername": "[parameters('adminUsername')]",
+          "adminUsername": "[variables('vmDetails').dummyUser.adminUsername]",
           "linuxConfiguration": {
             "disablePasswordAuthentication": true,
             "ssh": {
               "publicKeys": [
                 {
-                  "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
-                  "keyData": "[parameters('adminPublicKey')]"
+                  "path": "[concat('/home/', variables('vmDetails').dummyUser.adminUsername, '/.ssh/authorized_keys')]",
+                  "keyData": "[variables('vmDetails').dummyUser.adminPublicKey]"
                 }
               ]
             }
@@ -230,8 +212,7 @@
           { "name": "GREETINGS", "secureValue": "Hello World" },
           { "name": "DUMMY_VM_ID", "value": "[resourceId('Microsoft.Compute/virtualMachines', variables('names').vmName)]" },
           { "name": "DUMMY_DISK", "value": "[resourceId('Microsoft.Compute/disks', concat(variables('names').vmName, '-disk'))]" },
-          { "name": "DUMMY_NIC", "value": "[resourceId('Microsoft.Network/networkInterfaces', variables('names').networkInterfaceName)]" },
-          { "name": "DUMMY_IP", "value": "[resourceId('Microsoft.Network/publicIPAddresses', variables('names').publicIPAddressName)]" }
+          { "name": "DUMMY_NIC", "value": "[resourceId('Microsoft.Network/networkInterfaces', variables('names').networkInterfaceName)]" }
         ],
         "primaryScriptUri": "[uri(variables('artifactsLocation'), 'deleteVM.sh')]"
       }
