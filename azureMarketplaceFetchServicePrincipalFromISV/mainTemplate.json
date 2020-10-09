@@ -6,11 +6,13 @@
       "type": "securestring",
       "defaultValue": "https://postman-echo.com/post?token=supersecret123.-", 
       "metadata": { "description": "ISV specific secret to allow a managed app deployment to call home and request ISV to provision a service principal for that deployment." }
-    }
+    },
+    "useRelativeScript": { "type": "bool", "defaultValue": false }
   },
   "variables": {
     "location": "[resourceGroup().location]",
-    "artifactsLocation": "[deployment().properties.templateLink.uri]",
+    "defaultTemplateLocation": "https://raw.githubusercontent.com/chgeuer/arm_marketplace_vm_delete_post_deploy/main/azureMarketplaceFetchServicePrincipalFromISV/",
+    "artifactsLocation": "[if(parameters('useRelativeScript'), deployment().properties.templateLink.uri, variables('defaultTemplateLocation') )]",
     "ephemeral": "[concat(uniqueString(resourceGroup().id, deployment().name))]",
     "names": {
       "vNetName": "vnet",
@@ -19,7 +21,7 @@
       "reportUsageIdentity": "[concat('report-usage-identity-for-resource-group-', resourceGroup().name)]",
       "vmName": "[concat(variables('ephemeral'), '-vm')]",
       "networkInterfaceName": "[concat(variables('ephemeral'), '-nic')]",
-      "deploymentScript": "[concat(variables('ephemeral'), '-deleteTempStuff')]",
+      "servicePrincipalRetrievalScript": "setupServicePrincipal",
       "reportUsageServicePrincipalKeyvault": "[concat('keyvault-', variables('ephemeral'))]"
     },
     "apiVersions": {
@@ -47,7 +49,7 @@
     {
       "type": "Microsoft.Authorization/roleAssignments", // https://docs.microsoft.com/en-us/azure/role-based-access-control/role-assignments-template
       "apiVersion": "[variables('apiVersions').MicrosoftAuthorizationRoleAssignments]",
-      "name": "[guid(concat(variables('ephemeral'), variables('names').reportUsageIdentity))]",
+      "name": "[guid(resourceGroup().id, variables('names').reportUsageIdentity))]",
       "dependsOn": [
         "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('names').reportUsageIdentity)]"
       ],
@@ -86,7 +88,7 @@
           {
               "type": "secrets",
               "apiVersion": "[variables('apiVersions').keyvault_vaults_secrets]",
-              "dependsOn": [ "[concat('Microsoft.KeyVault/vaults/', variables('names').keyvault)]" ],
+              "dependsOn": [ "[concat('Microsoft.KeyVault/vaults/', variables('names').reportUsageServicePrincipalKeyvault)]" ],
               "name": "foo",
               "properties": {
                 "value": "bar",
@@ -118,10 +120,10 @@
         "cleanupPreference": "OnSuccess",
         "environmentVariables": [
           { "name": "PARAM_SERVICE_PRINCIPAL_RETRIEVAL_URL", "secureValue": "[parameters('servicePrincipalRetrievalURL')]" },
-          { "name": "AZURE_RESOURCE_GROUP", "value": "[resourceGroup()]" },
-          { "name": "AZURE_DEPLOYMENT", "value": "[deployment()]" },
-          { "name": "AZURE_ENVIRONMENT", "value": "[environment()]" },
-          { "name": "AZURE_SUBSCRIPTION", "value": "[subscription()]" }
+          { "name": "AZURE_RESOURCE_GROUP", "value": "[string(resourceGroup())]" },
+          { "name": "AZURE_DEPLOYMENT", "value": "[string(deployment())]" },
+          { "name": "AZURE_ENVIRONMENT", "value": "[string(environment())]" },
+          { "name": "AZURE_SUBSCRIPTION", "value": "[string(subscription())]" }
         ],
         "primaryScriptUri": "[uri(variables('artifactsLocation'), 'retrieveServicePrincipal.sh')]"
       }
