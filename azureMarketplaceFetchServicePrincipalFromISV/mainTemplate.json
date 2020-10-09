@@ -56,8 +56,8 @@
       "type": "Microsoft.Resources/deploymentScripts",
       "apiVersion": "[variables('apiVersions').MicrosoftResourcesDeploymentScripts]",
       "location": "[variables('location')]",
-      // "dependsOn": [ "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('names').reportUsageIdentity)]" ],
-      // "identity": { "type": "UserAssigned", "userAssignedIdentities": { "[resourceId(resourceGroup().name, 'Microsoft.ManagedIdentity/userAssignedIdentities', variables('names').reportUsageIdentity)]": { } } },
+      "dependsOn": [ "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('names').reportUsageIdentity)]" ],
+      "identity": { "type": "UserAssigned", "userAssignedIdentities": { "[resourceId(resourceGroup().name, 'Microsoft.ManagedIdentity/userAssignedIdentities', variables('names').reportUsageIdentity)]": { } } },
       "kind": "AzureCLI",
       "properties": {
         "azCliVersion": "2.11.1",
