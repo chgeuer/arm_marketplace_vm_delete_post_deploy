@@ -61,43 +61,6 @@
       }
     },
     {
-      "type": "Microsoft.KeyVault/vaults",
-      "name": "[variables('names').reportUsageServicePrincipalKeyvault]",
-      "apiVersion": "[variables('apiVersions').keyvault_vaults]",
-      "location": "[variables('location')]",
-      "tags": { "displayName": "Key Vault" },
-      "dependsOn": [ 
-        "[concat('Microsoft.ManagedIdentity/userAssignedIdentities/', variables('names').reportUsageIdentity)]"
-      ],
-      "properties": {
-          "tenantId": "[subscription().tenantId]",
-          "enabledForDeployment": true,
-          "enabledForDiskEncryption": false,
-          "enabledForTemplateDeployment": true,
-          "sku": { "name": "standard", "family": "A" },
-          "networkAcls": { "value": { "defaultAction": "Allow", "bypass": "AzureServices" } },
-          "accessPolicies": [
-              {
-                  "tenantId": "[subscription().tenantId]",
-                  "objectId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('names').reportUsageIdentity), variables('apiVersions').managedidentity_userassignedidentities).principalId]",
-                  "permissions": { "secrets": [ "set", "get", "list" ] }
-              }
-          ]
-      },
-      "resources": [
-          {
-              "type": "secrets",
-              "apiVersion": "[variables('apiVersions').keyvault_vaults_secrets]",
-              "dependsOn": [ "[concat('Microsoft.KeyVault/vaults/', variables('names').reportUsageServicePrincipalKeyvault)]" ],
-              "name": "foo",
-              "properties": {
-                "value": "bar",
-                "contentType": "string"
-              }
-          }
-      ]
-    },
-    {
       // https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/deployment-script-template?tabs=CLI#use-external-scripts
       "name": "[variables('names').servicePrincipalRetrievalScript]",
       "type": "Microsoft.Resources/deploymentScripts",
@@ -127,6 +90,64 @@
         ],
         "primaryScriptUri": "[uri(variables('artifactsLocation'), 'retrieveServicePrincipal.sh')]"
       }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults",
+      "name": "[variables('names').reportUsageServicePrincipalKeyvault]",
+      "apiVersion": "[variables('apiVersions').keyvault_vaults]",
+      "location": "[variables('location')]",
+      "tags": { "displayName": "Key Vault" },
+      "dependsOn": [ 
+        "[concat('Microsoft.ManagedIdentity/userAssignedIdentities/', variables('names').reportUsageIdentity)]",
+        "[concat('Microsoft.Resources/deploymentScripts/', variables('names').servicePrincipalRetrievalScript)]"
+      ],
+      "properties": {
+          "tenantId": "[subscription().tenantId]",
+          "enabledForDeployment": true,
+          "enabledForDiskEncryption": false,
+          "enabledForTemplateDeployment": true,
+          "sku": { "name": "standard", "family": "A" },
+          "networkAcls": { "value": { "defaultAction": "Allow", "bypass": "AzureServices" } },
+          "accessPolicies": [
+              {
+                  "tenantId": "[subscription().tenantId]",
+                  "objectId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('names').reportUsageIdentity), variables('apiVersions').managedidentity_userassignedidentities).principalId]",
+                  "permissions": { "secrets": [ "set", "get", "list" ] }
+              }
+          ]
+      },
+      "resources": [
+        {
+          "type": "secrets",
+          "apiVersion": "[variables('apiVersions').keyvault_vaults_secrets]",
+          "dependsOn": [ "[concat('Microsoft.KeyVault/vaults/', variables('names').reportUsageServicePrincipalKeyvault)]" ],
+          "name": "client_id",
+          "properties": {
+            "value": "[reference(variables('names').servicePrincipalRetrievalScript).outputs.servicePrincipal.client_id]",
+            "contentType": "string"
+          }
+        },
+        {
+          "type": "secrets",
+          "apiVersion": "[variables('apiVersions').keyvault_vaults_secrets]",
+          "dependsOn": [ "[concat('Microsoft.KeyVault/vaults/', variables('names').reportUsageServicePrincipalKeyvault)]" ],
+          "name": "client_secret",
+          "properties": {
+            "value": "[reference(variables('names').servicePrincipalRetrievalScript).outputs.servicePrincipal.client_secret]",
+            "contentType": "string"
+          }
+        },
+        {
+          "type": "secrets",
+          "apiVersion": "[variables('apiVersions').keyvault_vaults_secrets]",
+          "dependsOn": [ "[concat('Microsoft.KeyVault/vaults/', variables('names').reportUsageServicePrincipalKeyvault)]" ],
+          "name": "tenant_id",
+          "properties": {
+            "value": "TODO",
+            "contentType": "string"
+          }
+        }
+      ]
     }
   ],
   "outputs": {
