@@ -39,17 +39,17 @@
       "apiVersion": "[variables('apiVersions').managedidentity_userassignedidentities]",
       "location": "[variables('location')]"
     },
-    // {
-    //   "type": "Microsoft.Authorization/roleAssignments", // https://docs.microsoft.com/en-us/azure/role-based-access-control/role-assignments-template
-    //   "apiVersion": "[variables('apiVersions').MicrosoftAuthorizationRoleAssignments]",
-    //   "name": "[guid(concat(resourceGroup().id, variables('names').reportUsageIdentity))]",
-    //   "dependsOn": [ "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('names').reportUsageIdentity)]" ],
-    //   "properties": {
-    //     "roleDefinitionId": "[variables('buildInRolesID').Contributor]",
-    //     "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('names').reportUsageIdentity), variables('apiVersions').managedidentity_userassignedidentities).principalId]",
-    //     "scope": "[resourceGroup().id]", "principalType": "ServicePrincipal"
-    //   }
-    // },
+    {
+      "type": "Microsoft.Authorization/roleAssignments", // https://docs.microsoft.com/en-us/azure/role-based-access-control/role-assignments-template
+      "apiVersion": "[variables('apiVersions').MicrosoftAuthorizationRoleAssignments]",
+      "name": "[guid(concat(resourceGroup().id, variables('names').reportUsageIdentity))]",
+      "dependsOn": [ "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('names').reportUsageIdentity)]" ],
+      "properties": {
+        "roleDefinitionId": "[variables('buildInRolesID').Contributor]",
+        "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('names').reportUsageIdentity), variables('apiVersions').managedidentity_userassignedidentities).principalId]",
+        "scope": "[resourceGroup().id]", "principalType": "ServicePrincipal"
+      }
+    },
     {
       // https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/deployment-script-template?tabs=CLI#use-external-scripts
       "name": "[variables('names').servicePrincipalRetrievalScript]",
