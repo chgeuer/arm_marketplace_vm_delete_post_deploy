@@ -9,35 +9,24 @@
     "location": "[resourceGroup().location]",
     "artifactsLocation": "[deployment().properties.templateLink.uri]",
     "ephemeralSuffix": "[concat('deleteme-', uniqueString(resourceGroup().id, deployment().name))]",
-    "isvDetails": {
+    "imageDetails": {
       "publisher": "[split(parameters('imageURN'),':')[0]]",
-      "offer": "[split(parameters('imageURN'),':')[1]]",
+      "offer": "[concat(split(parameters('imageURN'),':')[1], if(parameters('usePreviewImage'), '-preview', ''))]",
       "sku": "[split(parameters('imageURN'),':')[2]]",
       "version": "[split(parameters('imageURN'),':')[3]]"
     },
     "vmDetails": {
-      "plan": {
-        "publisher": "[variables('isvDetails').publisher]",
-        "product": "[concat(variables('isvDetails').offer, if(parameters('usePreviewImage'), '-preview', ''))]",
-        "name": "[variables('isvDetails').sku]"
-      },
-      "imageReference": {
-        "publisher": "[variables('isvDetails').publisher]",
-        "offer": "[concat(variables('isvDetails').offer, if(parameters('usePreviewImage'), '-preview', ''))]",
-        "sku": "[variables('isvDetails').sku]",
-        "version": "[variables('isvDetails').version]"
-      },
       "vmSize": "Standard_D2s_v3",
       "dummyUser": {
         "adminUsername": "chgeuer",
         "adminPublicKey": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQChtYrLu/UY916owGYw5h7z+HVl452M+/GlLF3WQC0ONq9P+JBCoGgXfyI7bF+DMsx6Lx1WxMdEEnrPGQHIsYjRceYz3j8iS29PHV04tVDpfsS2H3ZH5S4n++CyvteIEbhvss5jeBnvqCgK+s3beJLEUhGR+63z57Lmk3nX3mw+Pe1xkTRTsU3aJxzlRi/h/pnne1/GP4eXP8rXpyFHLsaGUrLI2LRgvXVnzAWqB+JZcdsQKLY6pB9Scy1k3jMO28QHwhBWU1p4ZzU6X8/AIbGSi5VGAEw31VeaCa01MkZRysgEE+BLYiin0PEgMwU+6Oiq9hbvVnRJhp52MvstTHQv chgeuer@beam"
       }
     },
-    "vNetSubnetName": "default",
     "names": {
       "vNetName": "vnet",
-      "networkSecurityGroupNameSubnet": "[concat(variables('vNetSubnetName'), '-nsg')]",
-      "identity": "resource-group-contributor-identity",
+      "vNetSubnetName": "default",
+      "networkSecurityGroupNameSubnet": "default-nsg",
+      "identity": "[concat('contributor-identity-to-resource-group-', resourceGroup().name)]",
       "vmName": "[concat(variables('ephemeralSuffix'), '-vm')]",
       "networkInterfaceName": "[concat(variables('ephemeralSuffix'), '-nic')]",
       "deploymentScript": "[concat(variables('ephemeralSuffix'), '-deleteTempStuff')]"
@@ -96,7 +85,7 @@
         },
         "subnets": [
           {
-            "name": "[variables('vNetSubnetName')]",
+            "name": "[variables('names').vNetSubnetName]",
             "properties": {
               "addressPrefix": "[variables('addresses').vNetSubnetAddressPrefix]",
               "networkSecurityGroup": {
@@ -121,7 +110,7 @@
             "name": "ipconfig1",
             "properties": {
               "privateIPAllocationMethod": "Dynamic",
-              "subnet": { "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('names').vNetName, variables('vNetSubnetName'))]" }
+              "subnet": { "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('names').vNetName, variables('names').vNetSubnetName)]" }
             }
           }
         ]
@@ -135,7 +124,11 @@
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkInterfaces', variables('names').networkInterfaceName)]"
       ],
-      "plan": "[variables('vmDetails').plan]",
+      "plan": {
+        "publisher": "[variables('imageDetails').publisher]",
+        "product": "[variables('imageDetails').offer]",
+        "name": "[variables('imageDetails').sku]"
+      },
       "properties": {
         "hardwareProfile": { "vmSize": "[variables('vmDetails').vmSize]" },
         "osProfile": {
@@ -154,7 +147,12 @@
           }
         },
         "storageProfile": {
-          "imageReference": "[variables('vmDetails').imageReference]",
+          "imageReference": {
+            "publisher": "[variables('imageDetails').publisher]",
+            "offer": "[variables('imageDetails').offer]",
+            "sku": "[variables('imageDetails').sku]",
+            "version": "[variables('imageDetails').version]"
+          },
           "osDisk": { 
             "name": "[concat(variables('names').vmName, '-disk')]",
             "createOption": "FromImage"
