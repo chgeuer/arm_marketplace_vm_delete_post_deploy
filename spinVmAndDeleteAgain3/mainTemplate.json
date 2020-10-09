@@ -37,7 +37,7 @@
     "names": {
       "vNetName": "vnet",
       "networkSecurityGroupNameSubnet": "[concat(variables('vNetSubnetName'), '-nsg')]",
-      "identity": "[concat(variables('ephemeralSuffix'), '-identity')]",
+      "identity": "resource-group-contributor-identity",
       "vmName": "[concat(variables('ephemeralSuffix'), '-vm')]",
       "networkInterfaceName": "[concat(variables('ephemeralSuffix'), '-nic')]",
       "deploymentScript": "[concat(variables('ephemeralSuffix'), '-deleteTempStuff')]"
@@ -172,10 +172,9 @@
       "location": "[resourceGroup().location]"
     },
     {
-      // https://docs.microsoft.com/en-us/azure/role-based-access-control/role-assignments-template
-      "type": "Microsoft.Authorization/roleAssignments",
+      "type": "Microsoft.Authorization/roleAssignments", // https://docs.microsoft.com/en-us/azure/role-based-access-control/role-assignments-template
       "apiVersion": "[variables('apiVersions').MicrosoftAuthorizationRoleAssignments]",
-      "name": "[guid(concat(variables('names').identity, '-assignment-to-contributor'))]",
+      "name": "[guid(concat(variables('ephemeralSuffix'), variables('names').identity))]",
       "dependsOn": [
         "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('names').identity)]"
       ],
