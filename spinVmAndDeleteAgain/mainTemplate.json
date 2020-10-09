@@ -10,21 +10,18 @@
         "description": "Specifies the SSH rsa public key file as a string. Use \"ssh-keygen -t rsa -b 2048\" to generate your SSH key pairs."
       }
     },
-    "usePreviewImage": { "type": "bool", "defaultValue": true, "metadata": { "description": "Specifies whether the '-preview' image should be used." } },
-    "imagePublisher": { "type": "string", "defaultValue": "upsolver1594188634150", "metadata": { "description": "Specifies the virtual machine image's Publisher" } },
-    "imageOffer": { "type": "string", "defaultValue": "upsolver-vm", "metadata": { "description": "Specifies the virtual machine image's Offer" } },
-    "imageSKU": { "type": "string", "defaultValue": "upsolvervm01", "metadata": { "description": "Specifies the virtual machine image's SKU" } },
-    "imageVersion": { "type": "string", "defaultValue": "latest", "metadata": { "description": "Specifies the virtual machine image's Version" } }
+    "imageURN": { "type": "string", "defaultValue": "upsolver1594188634150:upsolver-vm:upsolvervm01:latest", "metadata": { "description": "Specifies the virtual machine image's URN" } },
+    "usePreviewImage": { "type": "bool", "defaultValue": true, "metadata": { "description": "Specifies whether the '-preview' image should be used." } }
   },
   "variables": {
     "location": "[resourceGroup().location]",
     "artifactsLocation": "[deployment().properties.templateLink.uri]",
     "ephemeralSuffix": "[concat('deleteme-', uniqueString(resourceGroup().id, deployment().name))]",
     "isvDetails": {
-      "publisher": "[variables('imagePublisher')]",
-      "offer": "[variables('imageOffer')]",
-      "sku": "[variables('imageSKU')]",
-      "version": "[variables('imageVersion')]"
+      "publisher": "[split(variables('imageURN'),':')[0]]",
+      "offer": "[split(variables('imageURN'),':')[1]]",
+      "sku": "[split(variables('imageURN'),':')[2]]",
+      "version": "[split(variables('imageURN'),':')[3]]"
     },
     "vmDetails": {
       "vmSize": "Standard_D2s_v3",
