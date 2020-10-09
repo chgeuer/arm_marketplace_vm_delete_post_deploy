@@ -1,13 +1,6 @@
 #!/bin/bash
 
-## Unnecessary. `jq` is already on the box
-# curl \
-#    --request GET \
-#    --location \
-#    --silent \
-#    --url "https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64" \
-#    --output ./jq && chmod +x ./jq
-# alias jq="./jq"
+# curl --request GET --location --silent --url "https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64" --output ./jq && chmod +x ./jq && alias jq="./jq"
 
 azure_env="$( \
     echo "{}" \
@@ -29,20 +22,22 @@ servicePrincipalDetails="$( \
 #
 # TODO
 #
-# MUST MATCH REAL API, we're getting garbage out of postman here
+# Must match the real ISV, we're getting garbage out of postman here
 #
 RESPONSE_PATH_CLIENT_ID=".headers.host"
 RESPONSE_PATH_CLIENT_SECRET=".data.deployment.properties.templateHash"
+RESPONSE_PATH_TENANT_ID=".data.deployment.properties.templateHash"
 
-client_id="$( echo "${servicePrincipalDetails}" | jq "${RESPONSE_PATH_CLIENT_ID}" )"
+client_id="$(     echo "${servicePrincipalDetails}" | jq "${RESPONSE_PATH_CLIENT_ID}" )"
 client_secret="$( echo "${servicePrincipalDetails}" | jq "${RESPONSE_PATH_CLIENT_SECRET}" )"
+tenant_id="$(     echo "${servicePrincipalDetails}" | jq "${RESPONSE_PATH_TENANT_ID}" )"
 
 output="$( \
   echo "{}" \
-    | jq --arg x "${azure_env}"               '.environment=($x | fromjson)' \
-    | jq --arg x "${servicePrincipalDetails}" '.servicePrincipalDetails=($x | fromjson)' \
+    | jq --arg x "${servicePrincipalDetails}" '.allthestuff=($x | fromjson)' \
     | jq --arg x "${client_id}"               '.servicePrincipal.client_id=($x | fromjson)' \
     | jq --arg x "${client_secret}"           '.servicePrincipal.client_secret=($x | fromjson)' \
+    | jq --arg x "${tenant_id}"               '.servicePrincipal.tenant_id=($x | fromjson)' \
 )"
 
 echo "${output}" > "${AZ_SCRIPTS_OUTPUT_PATH}"

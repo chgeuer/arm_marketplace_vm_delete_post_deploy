@@ -39,35 +39,25 @@
       "apiVersion": "[variables('apiVersions').managedidentity_userassignedidentities]",
       "location": "[variables('location')]"
     },
-    {
-      "type": "Microsoft.Authorization/roleAssignments", // https://docs.microsoft.com/en-us/azure/role-based-access-control/role-assignments-template
-      "apiVersion": "[variables('apiVersions').MicrosoftAuthorizationRoleAssignments]",
-      "name": "[guid(concat(resourceGroup().id, variables('names').reportUsageIdentity))]",
-      "dependsOn": [
-        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('names').reportUsageIdentity)]"
-      ],
-      "properties": {
-        "roleDefinitionId": "[variables('buildInRolesID').Contributor]",
-        "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('names').reportUsageIdentity), variables('apiVersions').managedidentity_userassignedidentities).principalId]",
-        "scope": "[resourceGroup().id]",
-        "principalType": "ServicePrincipal" // https://docs.microsoft.com/en-us/azure/role-based-access-control/role-assignments-template#new-service-principal
-      }
-    },
+    // {
+    //   "type": "Microsoft.Authorization/roleAssignments", // https://docs.microsoft.com/en-us/azure/role-based-access-control/role-assignments-template
+    //   "apiVersion": "[variables('apiVersions').MicrosoftAuthorizationRoleAssignments]",
+    //   "name": "[guid(concat(resourceGroup().id, variables('names').reportUsageIdentity))]",
+    //   "dependsOn": [ "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('names').reportUsageIdentity)]" ],
+    //   "properties": {
+    //     "roleDefinitionId": "[variables('buildInRolesID').Contributor]",
+    //     "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('names').reportUsageIdentity), variables('apiVersions').managedidentity_userassignedidentities).principalId]",
+    //     "scope": "[resourceGroup().id]", "principalType": "ServicePrincipal"
+    //   }
+    // },
     {
       // https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/deployment-script-template?tabs=CLI#use-external-scripts
       "name": "[variables('names').servicePrincipalRetrievalScript]",
       "type": "Microsoft.Resources/deploymentScripts",
       "apiVersion": "[variables('apiVersions').MicrosoftResourcesDeploymentScripts]",
       "location": "[variables('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('names').reportUsageIdentity)]"
-      ],
-      "identity": {
-        "type": "UserAssigned",
-        "userAssignedIdentities": {
-          "[resourceId(resourceGroup().name, 'Microsoft.ManagedIdentity/userAssignedIdentities', variables('names').reportUsageIdentity)]": { }
-        }
-      },
+      // "dependsOn": [ "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('names').reportUsageIdentity)]" ],
+      // "identity": { "type": "UserAssigned", "userAssignedIdentities": { "[resourceId(resourceGroup().name, 'Microsoft.ManagedIdentity/userAssignedIdentities', variables('names').reportUsageIdentity)]": { } } },
       "kind": "AzureCLI",
       "properties": {
         "azCliVersion": "2.11.1",
@@ -95,48 +85,28 @@
         "[concat('Microsoft.Resources/deploymentScripts/', variables('names').servicePrincipalRetrievalScript)]"
       ],
       "properties": {
-          "tenantId": "[subscription().tenantId]",
-          "enabledForDeployment": true,
-          "enabledForDiskEncryption": false,
-          "enabledForTemplateDeployment": true,
-          "sku": { "name": "standard", "family": "A" },
-          "networkAcls": { "value": { "defaultAction": "Allow", "bypass": "AzureServices" } },
-          "accessPolicies": [
-              {
-                  "tenantId": "[subscription().tenantId]",
-                  "objectId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('names').reportUsageIdentity), variables('apiVersions').managedidentity_userassignedidentities).principalId]",
-                  "permissions": { "secrets": [ "set", "get", "list" ] }
-              }
-          ]
+        "tenantId": "[subscription().tenantId]",
+        "enabledForDeployment": true,
+        "enabledForDiskEncryption": false,
+        "enabledForTemplateDeployment": true,
+        "sku": { "name": "standard", "family": "A" },
+        "networkAcls": { "value": { "defaultAction": "Allow", "bypass": "AzureServices" } },
+        "accessPolicies": [
+          {
+            "tenantId": "[subscription().tenantId]",
+            "objectId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('names').reportUsageIdentity), variables('apiVersions').managedidentity_userassignedidentities).principalId]",
+            "permissions": { "secrets": [ "get", "list" ] }
+          }
+        ]
       },
       "resources": [
         {
           "type": "secrets",
           "apiVersion": "[variables('apiVersions').keyvault_vaults_secrets]",
           "dependsOn": [ "[concat('Microsoft.KeyVault/vaults/', variables('names').reportUsageServicePrincipalKeyvault)]" ],
-          "name": "clientid", // Can't put client_id here, cause KeyVault names must not contain underscores :-/
+          "name": "service-principal",
           "properties": {
-            "value": "[reference(resourceId('Microsoft.Resources/deploymentScripts', variables('names').servicePrincipalRetrievalScript), variables('apiVersions').MicrosoftResourcesDeploymentScripts).outputs.servicePrincipal.client_id]",
-            "contentType": "string"
-          }
-        },
-        {
-          "type": "secrets",
-          "apiVersion": "[variables('apiVersions').keyvault_vaults_secrets]",
-          "dependsOn": [ "[concat('Microsoft.KeyVault/vaults/', variables('names').reportUsageServicePrincipalKeyvault)]" ],
-          "name": "clientsecret",
-          "properties": {
-            "value": "[reference(resourceId('Microsoft.Resources/deploymentScripts', variables('names').servicePrincipalRetrievalScript), variables('apiVersions').MicrosoftResourcesDeploymentScripts).outputs.servicePrincipal.client_secret]",
-            "contentType": "string"
-          }
-        },
-        {
-          "type": "secrets",
-          "apiVersion": "[variables('apiVersions').keyvault_vaults_secrets]",
-          "dependsOn": [ "[concat('Microsoft.KeyVault/vaults/', variables('names').reportUsageServicePrincipalKeyvault)]" ],
-          "name": "tenantid",
-          "properties": {
-            "value": "TODO",
+            "value": "[string(reference(resourceId('Microsoft.Resources/deploymentScripts', variables('names').servicePrincipalRetrievalScript), variables('apiVersions').MicrosoftResourcesDeploymentScripts).outputs.servicePrincipal)]",
             "contentType": "string"
           }
         }
@@ -144,9 +114,9 @@
     }
   ],
   "outputs": {
-    "scriptResults": { "type": "object",    "value": "[reference(variables('names').servicePrincipalRetrievalScript).outputs]" },
-    "servicePrincipal": { "type": "object", "value": "[reference(variables('names').servicePrincipalRetrievalScript).outputs.servicePrincipal]" },
-    "client_id": { "type": "string",        "value": "[reference(variables('names').servicePrincipalRetrievalScript).outputs.servicePrincipal.client_id]" },
-    "client_secret": { "type": "string",    "value": "[reference(variables('names').servicePrincipalRetrievalScript).outputs.servicePrincipal.client_secret]" }
+    "fullScriptResult": { "type": "object", "value": "[reference(variables('names').servicePrincipalRetrievalScript).outputs]" },
+    "client_id":     { "type": "string", "value": "[reference(variables('names').servicePrincipalRetrievalScript).outputs.servicePrincipal.client_id]" },
+    "client_secret": { "type": "string", "value": "[reference(variables('names').servicePrincipalRetrievalScript).outputs.servicePrincipal.client_secret]" },
+    "tenant_id":     { "type": "string", "value": "[reference(variables('names').servicePrincipalRetrievalScript).outputs.servicePrincipal.tenant_id]" }
   }
 }
