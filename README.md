@@ -3,7 +3,7 @@
 
 ## Deploy
 
-[![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fchgeuer%2Farm_marketplace_vm_delete_post_deploy%2Fmain%2FspinVmAndDeleteAgain%2FmainTemplate.json) 
+[![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fchgeuer%2Farm_marketplace_vm_delete_post_deploy%2Fmain%2FspinVmAndDeleteAgain3%2FmainTemplate.json) 
 
 ## What is this
 
@@ -19,10 +19,10 @@ Goal if this template is to be executed with a managed application deployment fr
 
 ### Target goal resource group with VNET and NSG
 
-![](spinVmAndDeleteAgain/docs/20201008125212.png)
+![](spinVmAndDeleteAgain3/docs/20201008125212.png)
 
 ### Outputs from the shell script within `deploymentScript`
 
-![](spinVmAndDeleteAgain/docs/20201008124847.png)
+![](spinVmAndDeleteAgain3/docs/20201008124847.png)
 
-![](spinVmAndDeleteAgain/docs/20201008125136.png)
+![](spinVmAndDeleteAgain3/docs/20201008125136.png)
