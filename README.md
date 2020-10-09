@@ -19,10 +19,10 @@ Goal if this template is to be executed with a managed application deployment fr
 
 ### Target goal resource group with VNET and NSG
 
-![](docs/20201008125212.png)
+![](spinVmAndDeleteAgain/docs/20201008125212.png)
 
 ### Outputs from the shell script within `deploymentScript`
 
-![](docs/20201008124847.png)
+![](spinVmAndDeleteAgain/docs/20201008124847.png)
 
-![](docs/20201008125136.png)
+![](spinVmAndDeleteAgain/docs/20201008125136.png)
